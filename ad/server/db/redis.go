@@ -17,6 +17,8 @@ func ConnectToRedis() (*redis.Client, error) {
 		return nil, err
 	}
 
+	log.Println("Connected to Redis")
+
 	return client, nil
 }
 
@@ -24,4 +26,5 @@ func DisconnectFromRedis(client *redis.Client) {
 	if err := client.Close(); err != nil {
 		log.Fatalf("Failed to close Redis client: %v", err)
 	}
+	log.Println("Disconnected to Redis")
 }
