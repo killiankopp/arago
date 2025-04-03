@@ -32,6 +32,11 @@ func NewAdService(collection *mongo.Collection, redisClient *redis.Client) *AdSe
 
 func (s *AdService) CreateAd(ctx context.Context, req *pb.CreateAdRequest) (*pb.CreateAdResponse, error) {
 	ad := req.Ad
+
+	if ad.Title == "" || ad.Url == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "title and url are required")
+	}
+
 	ad.Uuid = uuid.New().String()
 	err := s.insertAd(ctx, ad)
 	if err != nil {
