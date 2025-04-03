@@ -8,6 +8,7 @@ option go_package = "github.com/killiankopp/arago/tracker/proto";
 message AdImpression {
   string ad_uuid = 1;
   int32 count = 2;
+  int64 timestamp = 3; // New field for timestamp
 }
 
 message UpdateImpressionRequest {
