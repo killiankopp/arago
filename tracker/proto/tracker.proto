@@ -1,0 +1,33 @@
+
+syntax = "proto3";
+
+package tracker;
+
+option go_package = "github.com/killiankopp/arago/tracker/proto";
+
+message AdImpression {
+  string ad_uuid = 1;
+  int32 count = 2;
+}
+
+message UpdateImpressionRequest {
+  string ad_uuid = 1;
+}
+
+message UpdateImpressionResponse {
+  bool success = 1;
+}
+
+message GetImpressionCountRequest {
+  string ad_uuid = 1;
+}
+
+message GetImpressionCountResponse {
+  string ad_uuid = 1;
+  int32 count = 2;
+}
+
+service TrackerService {
+  rpc UpdateImpression(UpdateImpressionRequest) returns (UpdateImpressionResponse);
+  rpc GetImpressionCount(GetImpressionCountRequest) returns (GetImpressionCountResponse);
+}
