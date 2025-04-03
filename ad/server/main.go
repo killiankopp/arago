@@ -15,10 +15,6 @@ const (
 	dbName = "addb"
 )
 
-type server struct {
-	pb.UnimplementedAdServiceServer
-}
-
 func startGRPCServer(adService pb.AdServiceServer) error {
 	s := grpc.NewServer()
 
@@ -41,8 +37,14 @@ func main() {
 	}
 	defer db.DisconnectFromMongoDB(client)
 
+	redisClient, err := db.ConnectToRedis()
+	if err != nil {
+		log.Fatalf("Failed to connect to Redis: %v", err)
+	}
+	defer db.DisconnectFromRedis(redisClient)
+
 	adCollection := client.Database(dbName).Collection("ads")
-	adService := service.NewAdService(adCollection)
+	adService := service.NewAdService(adCollection, redisClient)
 
 	if err := startGRPCServer(adService); err != nil {
 		log.Fatalf("Failed to start gRPC server: %v", err)

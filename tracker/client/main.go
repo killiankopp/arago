@@ -20,7 +20,7 @@ func main() {
 	defer func(conn *grpc.ClientConn) {
 		err := conn.Close()
 		if err != nil {
-
+			log.Fatalf("Failed to close connection: %v", err)
 		}
 	}(conn)
 
