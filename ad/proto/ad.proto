@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package ad;
+
+option go_package = "github.com/killiankopp/arago/ad/proto";
+
+message Ad {
+    string uuid = 1;
+    string title = 2;
+    string description = 3;
+    string url = 4;
+}
+
+message AdRequest {
+    string uuid = 1;
+}
+
+message AdResponse {
+    Ad ad = 1;
+}
+
+message CreateAdRequest {
+    Ad ad = 1;
+}
+
+message CreateAdResponse {
+    string uuid = 1;
+}
+
+service AdService {
+    rpc CreateAd(CreateAdRequest) returns (CreateAdResponse);
+    rpc ReadAd(AdRequest) returns (AdResponse);
+    rpc ServeAd(AdRequest) returns (AdResponse);
+}
