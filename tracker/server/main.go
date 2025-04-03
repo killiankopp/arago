@@ -4,32 +4,24 @@ import (
 	"log"
 	"net"
 
+	"github.com/killiankopp/arago/tracker/config"
 	pb "github.com/killiankopp/arago/tracker/proto"
 	"github.com/killiankopp/arago/tracker/server/db"
 	"github.com/killiankopp/arago/tracker/server/service"
 	"google.golang.org/grpc"
 )
 
-const (
-	port   = ":50052"
-	dbName = "addb"
-)
-
-type server struct {
-	pb.UnimplementedTrackerServiceServer
-}
-
 func startGRPCServer(trackerService pb.TrackerServiceServer) error {
 	s := grpc.NewServer()
 
 	pb.RegisterTrackerServiceServer(s, trackerService)
 
-	lis, err := net.Listen("tcp", port)
+	lis, err := net.Listen("tcp", config.Port)
 	if err != nil {
 		return err
 	}
 
-	log.Printf("Server listening on %s", port)
+	log.Printf("Server listening on %s", config.Port)
 
 	return s.Serve(lis)
 }
@@ -41,7 +33,7 @@ func main() {
 	}
 	defer db.DisconnectFromMongoDB(client)
 
-	adCollection := client.Database(dbName).Collection("prints")
+	adCollection := client.Database(config.DBName).Collection(config.CollectionName)
 	trackerService := service.NewTrackerService(adCollection)
 
 	if err := startGRPCServer(trackerService); err != nil {

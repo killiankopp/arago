@@ -4,15 +4,11 @@ import (
 	"log"
 	"net"
 
+	"github.com/killiankopp/arago/ad/config"
 	pb "github.com/killiankopp/arago/ad/proto"
 	"github.com/killiankopp/arago/ad/server/db"
 	"github.com/killiankopp/arago/ad/server/service"
 	"google.golang.org/grpc"
-)
-
-const (
-	port   = ":50051"
-	dbName = "addb"
 )
 
 func startGRPCServer(adService pb.AdServiceServer) error {
@@ -20,12 +16,12 @@ func startGRPCServer(adService pb.AdServiceServer) error {
 
 	pb.RegisterAdServiceServer(s, adService)
 
-	lis, err := net.Listen("tcp", port)
+	lis, err := net.Listen("tcp", config.Port)
 	if err != nil {
 		return err
 	}
 
-	log.Printf("Server listening on %s", port)
+	log.Printf("Server listening on %s", config.Port)
 
 	return s.Serve(lis)
 }
@@ -43,7 +39,7 @@ func main() {
 	}
 	defer db.DisconnectFromRedis(redisClient)
 
-	adCollection := client.Database(dbName).Collection("ads")
+	adCollection := client.Database(config.DBName).Collection(config.CollectionName)
 	adService := service.NewAdService(adCollection, redisClient)
 
 	if err := startGRPCServer(adService); err != nil {

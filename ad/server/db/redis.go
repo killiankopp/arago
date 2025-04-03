@@ -2,13 +2,14 @@ package db
 
 import (
 	"github.com/go-redis/redis/v8"
+	"github.com/killiankopp/arago/ad/config"
 	"golang.org/x/net/context"
 	"log"
 )
 
 func ConnectToRedis() (*redis.Client, error) {
 	client := redis.NewClient(&redis.Options{
-		Addr: "localhost:6380",
+		Addr: config.RedisAddr,
 	})
 
 	_, err := client.Ping(context.Background()).Result()
