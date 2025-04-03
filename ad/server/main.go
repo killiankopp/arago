@@ -16,12 +16,12 @@ func startGRPCServer(adService pb.AdServiceServer) error {
 
 	pb.RegisterAdServiceServer(s, adService)
 
-	lis, err := net.Listen("tcp", config.Port)
+	lis, err := net.Listen("tcp", config.ServerURI)
 	if err != nil {
 		return err
 	}
 
-	log.Printf("Server listening on %s", config.Port)
+	log.Printf("Server listening on %s", config.ServerURI)
 
 	return s.Serve(lis)
 }

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
+	"github.com/killiankopp/arago/ad/config"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/grpc"
@@ -145,7 +146,7 @@ func (s *AdService) trackImpression(ctx context.Context, adUUID string) error {
 
 func (s *AdService) connectToTrackerService() (*grpc.ClientConn, error) {
 	creds := insecure.NewCredentials()
-	conn, err := grpc.NewClient("localhost:50052", grpc.WithTransportCredentials(creds))
+	conn, err := grpc.NewClient(config.ServerPrintURI, grpc.WithTransportCredentials(creds))
 	if err != nil {
 		log.Printf("Failed to connect to tracker service: %v", err)
 		return nil, status.Errorf(codes.Internal, "failed to connect to tracker service: %v", err)

@@ -9,7 +9,7 @@ import (
 
 func ConnectToRedis() (*redis.Client, error) {
 	client := redis.NewClient(&redis.Options{
-		Addr: config.RedisAddr,
+		Addr: config.RedisURI,
 	})
 
 	_, err := client.Ping(context.Background()).Result()

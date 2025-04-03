@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/killiankopp/arago/ad/config"
 	pb "github.com/killiankopp/arago/ad/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -13,7 +14,6 @@ import (
 )
 
 const (
-	address            = "localhost:50051"
 	defaultTitle       = "Super Title"
 	defaultDescription = "Super Description"
 	defaultURL         = "http://superexample.com"
@@ -21,7 +21,7 @@ const (
 )
 
 func main() {
-	conn, err := setupConnection(address)
+	conn, err := setupConnection(config.ServerURI)
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}

@@ -16,12 +16,12 @@ func startGRPCServer(trackerService pb.TrackerServiceServer) error {
 
 	pb.RegisterTrackerServiceServer(s, trackerService)
 
-	lis, err := net.Listen("tcp", config.Port)
+	lis, err := net.Listen("tcp", config.ServerURI)
 	if err != nil {
 		return err
 	}
 
-	log.Printf("Server listening on %s", config.Port)
+	log.Printf("Server listening on %s", config.ServerURI)
 
 	return s.Serve(lis)
 }

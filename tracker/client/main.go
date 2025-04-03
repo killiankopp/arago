@@ -5,13 +5,13 @@ import (
 	"log"
 	"time"
 
+	"github.com/killiankopp/arago/tracker/config"
 	pb "github.com/killiankopp/arago/tracker/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 const (
-	address     = "localhost:50052"
 	defaultUUID = "118bc050-ce8f-4210-9b88-adb5958f2c00"
 )
 
@@ -33,7 +33,7 @@ func main() {
 
 func setupClientConnection() (*grpc.ClientConn, pb.TrackerServiceClient) {
 	creds := insecure.NewCredentials()
-	conn, err := grpc.NewClient(address, grpc.WithTransportCredentials(creds))
+	conn, err := grpc.NewClient(config.ServerURI, grpc.WithTransportCredentials(creds))
 	if err != nil {
 		log.Fatalf("Failed to connect to server: %v", err)
 	}
