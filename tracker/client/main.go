@@ -7,6 +7,7 @@ import (
 
 	pb "github.com/killiankopp/arago/tracker/proto"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 const (
@@ -31,7 +32,8 @@ func main() {
 }
 
 func setupClientConnection() (*grpc.ClientConn, pb.TrackerServiceClient) {
-	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
+	creds := insecure.NewCredentials()
+	conn, err := grpc.NewClient(address, grpc.WithTransportCredentials(creds))
 	if err != nil {
 		log.Fatalf("Failed to connect to server: %v", err)
 	}

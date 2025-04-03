@@ -8,6 +8,7 @@ import (
 
 	pb "github.com/killiankopp/arago/ad/proto"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
 )
 
@@ -37,10 +38,12 @@ func main() {
 
 	createAd(c, ctx, defaultTitle, defaultDescription, defaultURL)
 	readAd(c, ctx, defaultUUID)
+	serveAd(c, ctx, defaultUUID)
 }
 
 func setupConnection(address string) (*grpc.ClientConn, error) {
-	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
+	creds := insecure.NewCredentials()
+	conn, err := grpc.NewClient(address, grpc.WithTransportCredentials(creds))
 	if err != nil {
 		return nil, err
 	}
@@ -79,4 +82,20 @@ func readAd(client pb.AdServiceClient, ctx context.Context, uuid string) {
 		return
 	}
 	log.Printf("Ad read: %v", r.GetAd())
+}
+
+func serveAd(client pb.AdServiceClient, ctx context.Context, uuid string) {
+	r, err := client.ServeAd(ctx, &pb.AdRequest{
+		Uuid: uuid,
+	})
+	if err != nil {
+		st, ok := status.FromError(err)
+		if ok && st.Code() == codes.NotFound {
+			log.Printf("Ad not found: %v", err)
+		} else {
+			log.Fatalf("could not serve ad: %v", err)
+		}
+		return
+	}
+	log.Printf("Ad served: %v", r.GetAd())
 }
