@@ -17,7 +17,7 @@ const (
 	defaultTitle       = "Super Title"
 	defaultDescription = "Super Description"
 	defaultURL         = "http://superexample.com"
-	defaultUUID        = "fdcab0f1-eb31-418a-870a-aaeccce9ee58"
+	defaultUUID        = "fe65a9a9-0fe3-4df8-b2e0-28564c340b9f"
 )
 
 func main() {

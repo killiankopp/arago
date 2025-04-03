@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	defaultUUID = "118bc050-ce8f-4210-9b88-adb5958f2c00"
+	defaultUUID = "fe65a9a9-0fe3-4df8-b2e0-28564c340b9f"
 )
 
 func main() {

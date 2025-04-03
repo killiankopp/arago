@@ -26,7 +26,7 @@ func NewTrackerService(collection *mongo.Collection) *TrackerService {
 func (s *TrackerService) UpdateImpression(ctx context.Context, req *pb.UpdateImpressionRequest) (*pb.UpdateImpressionResponse, error) {
 	log.Printf("Received UpdateImpression request for ad_uuid: %s", req.AdUuid)
 
-	filter := bson.M{"ad_uuid": req.AdUuid}
+	filter := bson.M{"_id": req.AdUuid}
 	update := bson.M{
 		"$inc": bson.M{"count": 1},
 		"$set": bson.M{"timestamp": time.Now().Unix()},
@@ -44,7 +44,7 @@ func (s *TrackerService) UpdateImpression(ctx context.Context, req *pb.UpdateImp
 }
 
 func (s *TrackerService) GetImpressionCount(ctx context.Context, req *pb.GetImpressionCountRequest) (*pb.GetImpressionCountResponse, error) {
-	filter := bson.M{"ad_uuid": req.AdUuid}
+	filter := bson.M{"_id": req.AdUuid}
 	var impression pb.AdImpression
 
 	err := s.collection.FindOne(ctx, filter).Decode(&impression)
