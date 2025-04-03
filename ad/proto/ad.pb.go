@@ -27,6 +27,7 @@ type Ad struct {
 	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
 	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	Url           string                 `protobuf:"bytes,4,opt,name=url,proto3" json:"url,omitempty"`
+	Expiration    int64                  `protobuf:"varint,5,opt,name=expiration,proto3" json:"expiration,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -87,6 +88,13 @@ func (x *Ad) GetUrl() string {
 		return x.Url
 	}
 	return ""
+}
+
+func (x *Ad) GetExpiration() int64 {
+	if x != nil {
+		return x.Expiration
+	}
+	return 0
 }
 
 type AdRequest struct {
@@ -269,12 +277,15 @@ var File_proto_ad_proto protoreflect.FileDescriptor
 
 const file_proto_ad_proto_rawDesc = "" +
 	"\n" +
-	"\x0eproto/ad.proto\x12\x02ad\"b\n" +
+	"\x0eproto/ad.proto\x12\x02ad\"\x82\x01\n" +
 	"\x02Ad\x12\x12\n" +
 	"\x04uuid\x18\x01 \x01(\tR\x04uuid\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x10\n" +
-	"\x03url\x18\x04 \x01(\tR\x03url\"\x1f\n" +
+	"\x03url\x18\x04 \x01(\tR\x03url\x12\x1e\n" +
+	"\n" +
+	"expiration\x18\x05 \x01(\x03R\n" +
+	"expiration\"\x1f\n" +
 	"\tAdRequest\x12\x12\n" +
 	"\x04uuid\x18\x01 \x01(\tR\x04uuid\"$\n" +
 	"\n" +
@@ -287,7 +298,7 @@ const file_proto_ad_proto_rawDesc = "" +
 	"\tAdService\x125\n" +
 	"\bCreateAd\x12\x13.ad.CreateAdRequest\x1a\x14.ad.CreateAdResponse\x12'\n" +
 	"\x06ReadAd\x12\r.ad.AdRequest\x1a\x0e.ad.AdResponse\x12(\n" +
-	"\aServeAd\x12\r.ad.AdRequest\x1a\x0e.ad.AdResponseB#Z!github.com/killian/arago/ad/protob\x06proto3"
+	"\aServeAd\x12\r.ad.AdRequest\x1a\x0e.ad.AdResponseB'Z%github.com/killiankopp/arago/ad/protob\x06proto3"
 
 var (
 	file_proto_ad_proto_rawDescOnce sync.Once

@@ -38,6 +38,7 @@ func (s *AdService) CreateAd(ctx context.Context, req *pb.CreateAdRequest) (*pb.
 	}
 
 	ad.Uuid = uuid.New().String()
+	ad.Expiration = time.Now().Unix() + config.ExpirationDelay
 	err := s.insertAd(ctx, ad)
 	if err != nil {
 		return nil, err
@@ -51,6 +52,7 @@ func (s *AdService) insertAd(ctx context.Context, ad *pb.Ad) error {
 		"title":       ad.Title,
 		"description": ad.Description,
 		"url":         ad.Url,
+		"expiration":  ad.Expiration,
 	})
 	return err
 }
@@ -70,6 +72,7 @@ type AdWithoutLock struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	Url         string `json:"url"`
+	Expiration  int64  `json:"expiration"`
 }
 
 func (s *AdService) findAdByUUID(ctx context.Context, uuid string) (*pb.Ad, error) {
@@ -90,13 +93,21 @@ func (s *AdService) findAdByUUID(ctx context.Context, uuid string) (*pb.Ad, erro
 			Title:       ad.Title,
 			Description: ad.Description,
 			Url:         ad.Url,
+			Expiration:  ad.Expiration,
 		}
 
 		adBytes, err := json.Marshal(adWithoutLock)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to marshal ad: %v", err)
 		}
-		err = s.redisClient.Set(ctx, uuid, adBytes, 10*time.Minute).Err()
+
+		cacheTime := time.Duration(config.CacheDelay)
+		expirationDuration := time.Until(time.Unix(ad.Expiration, 0))
+		if cacheTime > expirationDuration {
+			cacheTime = expirationDuration
+		}
+
+		err = s.redisClient.Set(ctx, uuid, adBytes, cacheTime).Err()
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to cache ad: %v", err)
 		}
@@ -107,6 +118,17 @@ func (s *AdService) findAdByUUID(ctx context.Context, uuid string) (*pb.Ad, erro
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to unmarshal ad: %v", err)
 		}
+	}
+
+	log.Printf("Ad expiration time: %d", ad.Expiration)
+	log.Printf("Now time: %d", time.Now().Unix())
+
+	if ad.Expiration < time.Now().Unix() {
+		_, err = s.collection.DeleteOne(ctx, bson.M{"_id": uuid})
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to delete expired ad: %v", err)
+		}
+		return nil, status.Errorf(codes.NotFound, "ad not found")
 	}
 
 	return &ad, nil
