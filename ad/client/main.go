@@ -2,18 +2,21 @@ package main
 
 import (
 	"context"
+	"google.golang.org/grpc/codes"
 	"log"
 	"time"
 
 	pb "github.com/killiankopp/arago/ad/proto"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/status"
 )
 
 const (
 	address            = "localhost:50051"
-	defaultTitle       = "New Ad Title"
-	defaultDescription = "New Ad Description"
-	defaultURL         = "http://example.com"
+	defaultTitle       = "Super Title"
+	defaultDescription = "Super Description"
+	defaultURL         = "http://superexample.com"
+	defaultUUID        = "118bc050-ce8f-4210-9b88-adb5958f2c00"
 )
 
 func main() {
@@ -21,13 +24,19 @@ func main() {
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
-	defer conn.Close()
+	defer func(conn *grpc.ClientConn) {
+		err := conn.Close()
+		if err != nil {
+			log.Fatalf("failed to close connection: %v", err)
+		}
+	}(conn)
 	c := pb.NewAdServiceClient(conn)
 
 	ctx, cancel := createContext(time.Second)
 	defer cancel()
 
 	createAd(c, ctx, defaultTitle, defaultDescription, defaultURL)
+	readAd(c, ctx, defaultUUID)
 }
 
 func setupConnection(address string) (*grpc.ClientConn, error) {
@@ -54,4 +63,20 @@ func createAd(client pb.AdServiceClient, ctx context.Context, title, description
 		log.Fatalf("could not create ad: %v", err)
 	}
 	log.Printf("Ad created: %s", r.GetUuid())
+}
+
+func readAd(client pb.AdServiceClient, ctx context.Context, uuid string) {
+	r, err := client.ReadAd(ctx, &pb.AdRequest{
+		Uuid: uuid,
+	})
+	if err != nil {
+		st, ok := status.FromError(err)
+		if ok && st.Code() == codes.NotFound {
+			log.Printf("Ad not found: %v", err)
+		} else {
+			log.Fatalf("could not read ad: %v", err)
+		}
+		return
+	}
+	log.Printf("Ad read: %v", r.GetAd())
 }
